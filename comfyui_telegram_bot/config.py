@@ -35,6 +35,12 @@ class BaseConfig:
                 
         return cls(**kwargs)
 
+
+@dataclass
+class LoggerConfig(BaseConfig):
+    debug: bool
+
+
 @dataclass
 class PromptEnhanceTypeConfig(BaseConfig):
     description: str
@@ -90,6 +96,7 @@ class Config(BaseConfig):
     prompt_enhancement: PromptEnhanceConfig
     telegram_bot: TelegramBotConfig
     image_generation: ImageGenerationConfig
+    logger: LoggerConfig
 
     @classmethod
     def from_yaml(cls, path: Path | str) -> 'Config':

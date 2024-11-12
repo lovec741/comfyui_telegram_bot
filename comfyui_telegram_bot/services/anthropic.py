@@ -1,6 +1,6 @@
 import anthropic
-from typing import Optional
 import re
+from .. import logger
 
 from ..prompt_enhance import PromptEnhanceService
 
@@ -41,15 +41,13 @@ class AnthopicService(PromptEnhanceService):
                 prompt_match = re.search(r'<prompt>((.|\n)*?)</prompt>', prompt, re.DOTALL)
                 if prompt_match:
                     extracted_prompt = prompt_match.group(1).strip()
-                    print("Enhanced prompt:", extracted_prompt)
                     return extracted_prompt
                 else:
-                    print(f"Attempt {attempt + 1}: No prompt found between <prompt> tags.")
+                    logger.warning(f"Attempt {attempt + 1}: No prompt found between <prompt> tags.")
             except Exception as e:
                 if attempt == retries - 1:
-                    print(f"Failed to create prompt after {retries} attempts. Error: {str(e)}")
+                    logger.error(f"Failed to create prompt after {retries} attempts. Error: {e}")
                 else:
-                    print(f"Attempt {attempt + 1} failed. Retrying...")
-        else:
-            print("Failed to create a valid prompt after all attempts.")
-            raise Exception(f"Failed to generate enhanced prompt, please try again later.")
+                    logger.warning(f"Attempt {attempt + 1} failed. Error: {e} Retrying...")
+        logger.error("Failed to create a valid prompt after all attempts.")
+        raise Exception(f"Failed to generate enhanced prompt, please try again later.")

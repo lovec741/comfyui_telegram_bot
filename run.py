@@ -1,3 +1,3 @@
-from comfyui_telegram_bot import main
+from comfyui_telegram_bot.telegram_bot import main
 
 main()

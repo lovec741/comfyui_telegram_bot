@@ -1,3 +1,6 @@
+logger:
+    debug: false
+
 telegram_bot:
     token: "your-telegram-bot-token"
 

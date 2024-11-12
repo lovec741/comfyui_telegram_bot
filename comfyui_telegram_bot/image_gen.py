@@ -12,6 +12,7 @@ import asyncio
 import io
 import os
 import requests
+from . import logger
 
 @dataclass
 class GenerationParameters:
@@ -20,6 +21,7 @@ class GenerationParameters:
     batch_size: int
     width: int
     height: int
+    is_set_seed: bool
     seed: Optional[int]
     cfg: float
     steps: int
@@ -57,6 +59,7 @@ class GenerationParameters:
         cfg = params.get("cfg", mode_config.cfg)
         steps = params.get("steps", mode_config.steps)
         seed = params.get("seed")
+        is_set_seed = seed is not None
         prompt_enhance = params.get("prompt_enhance")
 
         return cls(
@@ -67,6 +70,7 @@ class GenerationParameters:
             height=height,
             seed=seed,
             cfg=cfg,
+            is_set_seed=is_set_seed,
             steps=steps,
             lora=mode_config.lora,
             lora_strength=mode_config.lora_strength,
@@ -156,7 +160,6 @@ class GenerationParameters:
             message = message.replace(match.group(), '', 1)
         prompt = message.strip()
         
-        print("PROMPT:", prompt, result_params)
         return prompt, result_params
     
     @staticmethod
@@ -186,12 +189,24 @@ class GenerationParameters:
     def update_prompt(self, prompt):
         self.prompt = prompt
 
+    def update_before_generation(self):
+        if not self.is_set_seed: # randomize seed if not set by user
+            self.seed = random.randint(0, 2**32 - 1)
+    
+    def create_description(self):
+        desc = f"Size: {self.width}x{self.height}\nSeed: `{self.seed}`\nGuidance: {self.cfg}\nSteps: {self.steps}"
+        if self.lora:
+            desc += f"\nLora: `{self.lora}`\nLora strength: {self.lora_strength}"
+        if self.mode != "default":
+            desc += f"\nMode: {self.mode}"
+        return desc
+
+
 class ComfyUIImageGeneration:
     def __init__(self, config: ImageGenerationConfig):
         self.config = config
         with open(self.config.workflow_filepath, "r") as file:
             self.workflow = json.load(file)
-
 
     def create_placeholder_image(self, gp: GenerationParameters):
         width, height = gp.width, gp.height
@@ -207,17 +222,6 @@ class ComfyUIImageGeneration:
         placeholder_path = f"placeholder_{gp.user_id}.jpg"
         placeholder_image.save(placeholder_path)
         return placeholder_path
-    
-    @staticmethod
-    def _create_final_caption(gp: GenerationParameters) -> str:
-        final_caption = f"Final image generated with settings:\nSize: {gp.width}x{gp.height}\nSeed: `{gp.seed}`\nGuidance: {gp.cfg}\nSteps: {gp.steps}"
-        if gp.lora:
-            final_caption += f"\nLora: `{gp.lora}`\nLora strength: {gp.lora_strength}"
-        if gp.mode != "default":
-            final_caption += f"\nMode: {gp.mode}"
-        
-        final_caption = final_caption.replace(".", "\\.")
-        return final_caption
 
     def _prepare_workflow(self, gp: GenerationParameters) -> dict:
         workflow = deepcopy(self.workflow)
@@ -240,9 +244,7 @@ class ComfyUIImageGeneration:
 
         workflow["6"]["inputs"]["text"] = gp.prompt
 
-        seed = gp.seed if gp.seed is not None else random.randint(0, 2**32 - 1)
-        workflow["25"]["inputs"]["noise_seed"] = seed
-
+        workflow["25"]["inputs"]["noise_seed"] = gp.seed
 
         workflow["27"]["inputs"]["width"] = gp.width
         workflow["27"]["inputs"]["height"] = gp.height
@@ -254,6 +256,8 @@ class ComfyUIImageGeneration:
         return workflow
     
     async def generate_image(self, gp: GenerationParameters, edit_caption_callback, edit_media_callback, user_queues):
+        logger.info(f"Generation started for user {gp.user_id}")
+        gp.update_before_generation()
         workflow = self._prepare_workflow(gp)
         
         comfy_prompt = {
@@ -262,14 +266,15 @@ class ComfyUIImageGeneration:
         }
 
         async with websockets.connect(f"{self.config.websocket_url}?clientId={gp.user_id}") as websocket:
-            websocket_task = asyncio.create_task(self._process_websocket_messages(gp.user_id, workflow, websocket, user_queues, edit_caption_callback, edit_media_callback))
             response = requests.post(f"{self.config.server_url}/prompt", json=comfy_prompt)
             prompt_id = response.json()['prompt_id']
+            websocket_task = asyncio.create_task(self._process_websocket_messages(gp.user_id, workflow, websocket, user_queues, edit_caption_callback, edit_media_callback))
             websocket_task.prompt_id = prompt_id
             ok = await websocket_task
         if not ok:
             return
         
+        logger.info("Generation complete")
         await edit_caption_callback("Image generation complete. Fetching final result...")
 
         history_response = requests.get(f"{self.config.server_url}/history/{prompt_id}")
@@ -284,16 +289,22 @@ class ComfyUIImageGeneration:
 
         if image_filename:
             image_url = f"{self.config.server_url}/view?filename={image_filename}"
+            if not self.config.save_images:
+                image_url += "&type=temp"
             image_response = requests.get(image_url)
             image = Image.open(io.BytesIO(image_response.content))
             temp_image_path = f"temp_image_{gp.user_id}.png"
             image.save(temp_image_path)
-            await edit_media_callback(caption=self._create_final_caption(gp), media_path=temp_image_path, parse_mode='MarkdownV2')
+            final_caption = f"Final image generated with settings:\n{gp.create_description().replace('.', '\\.')}"
+            logger.debug("Sending final image")
+            await edit_media_callback(caption=final_caption, media_path=temp_image_path, parse_mode='MarkdownV2')
             os.remove(temp_image_path)
         else:
+            logger.error("Failed to find result image")
             await edit_caption_callback("Failed to generate image.")
 
     async def _process_websocket_messages(self, user_id, workflow, websocket, user_queues, edit_caption_callback, edit_media_callback):
+        logger.debug("Start websocket communication")
         show_preview = False
         current_caption = None
         prompt_id = None
@@ -303,17 +314,18 @@ class ComfyUIImageGeneration:
                 prompt_id = asyncio.current_task().prompt_id
 
             if user_queues[user_id][0]['cancel']:
+                logger.info("Generation cancelled")
                 if user_queues[user_id][0]["running"]:
                     response = requests.post(f"{self.config.server_url}/interrupt")
-                    print("Response:", response.text)
+                    logger.debug("ws Response:", response.text)
                 else:
                     response = requests.post(f"{self.config.server_url}/queue", json={"delete": [prompt_id]})
-                    print("Response:", response.text)
+                    logger.debug("ws Response:", response.text)
                 await edit_caption_callback("Image generation cancelled.")
                 return False
 
             if isinstance(message, str):
-                print(message)
+                logger.debug(f"ws Message: {message}")
                 show_preview = False
                 data = json.loads(message)
                 if 'data' in data and data['data'].get('prompt_id') != prompt_id:
@@ -332,6 +344,7 @@ class ComfyUIImageGeneration:
                     max_value = data['data']['max']
                     if (value-1) % self.config.update_preview_every_n_steps == 0:
                         show_preview = True
+                    logger.info(f"Generation progress {value}/{max_value}")
                     current_caption = f"Progress: {value}/{max_value}"
                 elif data['type'] == 'executed':
                     node_id = data['data']['node']
@@ -341,6 +354,7 @@ class ComfyUIImageGeneration:
                 elif data['type'] == 'execution_success':
                     break
                 elif data['type'] == 'execution_error':
+                    logger.info(f"Generation failed {data['data']}")
                     caption = "Failed to generate image, an error has occured. Try again."
                     if "data" in data:
                         caption += f" (Error type: {data['data'].get('exception_type')}, Error message: {data['data'].get('exception_message')})"
@@ -350,12 +364,11 @@ class ComfyUIImageGeneration:
                 await edit_caption_callback(current_caption)
 
             elif show_preview:
+                logger.debug(f"Updating preview")
                 image = Image.open(io.BytesIO(message[8:]))
                 temp_preview_path = f"temp_preview_{user_id}.png"
                 image.save(temp_preview_path, "PNG")
                 await edit_media_callback(caption=current_caption, media_path=temp_preview_path)
                 os.remove(temp_preview_path)
         return True
-
-        
 
