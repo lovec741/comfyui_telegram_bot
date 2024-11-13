@@ -227,7 +227,7 @@ You can add parameters at the end of your prompt.
 <b>Prompt enhancement</b>:
 {}
 
-<u>Usage example</u>: 
+<u>Usage examples</u>: 
 "Create a landscape with mountains <code>1920x1080 2x</code>"
 "A man in a red t-shirt <code>2MP pe=default m=real</code>"
     """.format(modes_text, pe_types_text)
@@ -261,3 +261,4 @@ def main() -> None:
     
     logger.info("Started telegram bot")
     application.run_polling(allowed_updates=Update.ALL_TYPES)
+    logger.info("Stopped telegram bot")

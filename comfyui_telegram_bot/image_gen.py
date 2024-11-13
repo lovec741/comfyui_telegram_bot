@@ -268,8 +268,7 @@ class ComfyUIImageGeneration:
         async with websockets.connect(f"{self.config.websocket_url}?clientId={gp.user_id}") as websocket:
             response = requests.post(f"{self.config.server_url}/prompt", json=comfy_prompt)
             prompt_id = response.json()['prompt_id']
-            websocket_task = asyncio.create_task(self._process_websocket_messages(gp.user_id, workflow, websocket, user_queues, edit_caption_callback, edit_media_callback))
-            websocket_task.prompt_id = prompt_id
+            websocket_task = asyncio.create_task(self._process_websocket_messages(gp.user_id, workflow, websocket, user_queues, prompt_id, edit_caption_callback, edit_media_callback))
             ok = await websocket_task
         if not ok:
             return
@@ -303,16 +302,12 @@ class ComfyUIImageGeneration:
             logger.error("Failed to find result image")
             await edit_caption_callback("Failed to generate image.")
 
-    async def _process_websocket_messages(self, user_id, workflow, websocket, user_queues, edit_caption_callback, edit_media_callback):
+    async def _process_websocket_messages(self, user_id, workflow, websocket, user_queues, prompt_id, edit_caption_callback, edit_media_callback):
         logger.debug("Start websocket communication")
         show_preview = False
         current_caption = None
-        prompt_id = None
 
         async for message in websocket:
-            if prompt_id is None and hasattr(asyncio.current_task(), 'prompt_id'):
-                prompt_id = asyncio.current_task().prompt_id
-
             if user_queues[user_id][0]['cancel']:
                 logger.info("Generation cancelled")
                 if user_queues[user_id][0]["running"]:
