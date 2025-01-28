@@ -5,12 +5,10 @@ from telegram.ext import Application, CommandHandler, MessageHandler, filters, C
 from collections import deque
 from telegram.error import NetworkError, TimedOut
 from functools import wraps
-import traceback
 
 from .prompt_enhance import PromptEnhanceServiceFactory, PromptEnhanceService
 from .image_gen import ComfyUIImageGeneration, GenerationParameters
 from .config import ModeConfig
-
 from . import logger, config
 
 img_gen = ComfyUIImageGeneration(config.image_generation)
@@ -224,12 +222,17 @@ You can add parameters at the end of your prompt.
     4 flat colors/cartoon
 <b>Steps</b>: <code>s=20</code>
 <b>Seed</b>: <code>seed=123456789</code> (random by default)
-<b>Prompt enhancement</b>:
+<b>Prompt enhancement (via an LLM)</b>:
 {}
 
 <u>Usage examples</u>: 
-"Create a landscape with mountains <code>1920x1080 2x</code>"
+"A landscape with mountains <code>1920x1080 2x</code>"
 "A man in a red t-shirt <code>2MP pe=default m=real</code>"
+
+<u>Recommended prompting style</u>:
+<b>NOTE</b>: If you use Prompt enhancement, you can input basically anything and your prompt will be rewritten in the correct style.
+1. Write a description of what you want in the image. Don't write instructions! (DO: "A winter landscape", DON'T: "Create an image of...")
+2. Write full sentences. Don't write words separated by commas. (DO: "A man sitting on a bench wearing a red t-shirt.", DON'T: "man, sitting on bench, red t-shirt")
     """.format(modes_text, pe_types_text)
     await update.message.reply_text(help_text, parse_mode="HTML")
 

@@ -35,17 +35,14 @@ class BaseConfig:
                 
         return cls(**kwargs)
 
-
 @dataclass
 class LoggerConfig(BaseConfig):
     debug: bool
-
 
 @dataclass
 class PromptEnhanceTypeConfig(BaseConfig):
     description: str
     system_prompt: str
-
 
 @dataclass
 class PromptEnhanceConfig(BaseConfig):
@@ -90,6 +87,9 @@ class ImageGenerationConfig(BaseConfig):
     placeholder_image_font_filepath: Path
     update_preview_every_n_steps: int
     modes: Dict[str, ModeConfig] = field(default_factory=dict)
+
+    def get_mode_config_defaults(self) -> ModeConfig:
+        return self.modes.get("default", ModeConfig())
 
 @dataclass
 class Config(BaseConfig):

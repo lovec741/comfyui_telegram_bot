@@ -1,8 +1,9 @@
-from .config import PromptEnhanceConfig
 from importlib import import_module
 import inspect
 import os
 from typing import Type, Dict, Any, Optional
+
+from .config import PromptEnhanceConfig
 
 class PromptEnhanceService:
     def __init__(self, config: PromptEnhanceConfig):

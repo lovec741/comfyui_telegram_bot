@@ -3,7 +3,6 @@ import re
 from typing import Tuple, Dict, Any, Optional
 import math
 import random
-from .config import ImageGenerationConfig, ModeConfig
 from PIL import Image, ImageDraw, ImageFont
 from copy import deepcopy
 import json
@@ -12,6 +11,8 @@ import asyncio
 import io
 import os
 import requests
+
+from .config import ImageGenerationConfig, ModeConfig
 from . import logger
 
 @dataclass
@@ -50,7 +51,7 @@ class GenerationParameters:
 
         mode = params.get("mode", "default")
         if mode == "default":
-            mode_config = ModeConfig.get_defaults()
+            mode_config = config.get_mode_config_defaults()
         elif mode in config.modes:
             mode_config = config.modes[mode]
         else:
