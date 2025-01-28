@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ComfyUI Bot - Setup</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header class="container">
+        <nav class="navbar">
+            <a href="index.html" class="lead">ComfyUI Telegram Bot</a>
+            <a href="setup.html" class="active">Setup</a>
+            <a href="usage.html">Usage</a>
+            <a href="dev.html">Customization and Extensibility</a>
+        </nav> 
+    </header>
+    <article class="container">
+        <h1>Setting it all up</h1>
+        <div>
+            <div class="contents">
+                <span class="bold">Contents</span>
+                <ul>
+                    <li><a href="#prerequisites">Prerequisites</a></li>
+                    <li><a href="#install">Installation</a></li>
+                    <li><a href="#config">Configuration</a></li>
+                    <li><a href="#run">Running the Bot</a></li>
+                </ul>
+            </div>
+        </div>
+        <section id="prerequisites">
+            <h2>Prerequisites</h2>
+            <table class="basic-table bold-table">
+                <tbody>
+                    <tr>
+                        <td>Python 3.10+</td>
+                        <td>A recent version of Python. Can be installed from the official website or your favourite package manager.</td>
+                    </tr>
+                    <tr>
+                        <td>ComfyUI and models</td>
+                        <td>Installed and running ComfyUI server. A downloaded Flux model, VAE and the coresponding T5 and L text encoders. For detailed instructions visit the ComfyUI repo.</td>
+                    </tr>
+                    <tr>
+                        <td>Git</td>
+                        <td>Can be installed from the official website or your favourite package manager.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+        <section id="install">
+            <h2>Installation</h2>
+            <ol>
+                <li>Clone the ComfyUI Telegram Bot repo from Github: <pre>git clone https://github.com/lovec741/comfyui_telegram_bot.git</pre></li>
+                <li>Open the cloned repo: <pre>cd comfyui_telegram_bot</pre></li>
+                <li>Install dependencies: <pre>pip install -r requirements.txt</pre></li>
+                <li>Now we need to configure the bot.</li>
+            </ol>
+        </section>
+        <section id="config">
+            <h2>Configuration</h2>
+            <p>Copy the <code>config.example.yaml</code> and rename it to <code>config.yaml</code></p>
+            <p>All of the configuration takes place in the <code>config.yaml</code> file</p>
+            <p class="bold">What needs to be changed:</p>
+            <table class="basic-table">
+                <tbody>
+                    <tr>
+                        <td colspan="2" class="bold">telegram_bot</td>
+                    </tr>
+                    <tr>
+                        <td><code>token</code></td>
+                        <td>To get this token message @BotFather on Telegram and create a bot.</td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" class="bold">image_generation</td>
+                    </tr>
+                    <tr>
+                        <td><code>server_url</code> and <code>websocket_url</code></td>
+                        <td>Can be left as is. You will need to change this if the ComfyUI server is not running on your local machine or you changed the default port.</td>
+                    </tr>
+                    <tr>
+                        <td><code>model</code></td>
+                        <td>The name of your model located in the <code>models/unet</code> in your ComfyUI installation. (By default only UNET models are supported)</td>
+                    </tr>
+                    <tr>
+                        <td><code>vae</code></td>
+                        <td>The name the VAE located in the <code>models/vae</code> in your ComfyUI installation.</td>
+                    </tr>
+                    <tr>
+                        <td><code>clip_t5</code></td>
+                        <td>The name the T5 text encoder located in the <code>models/clip</code> in your ComfyUI installation.</td>
+                    </tr>
+                    <tr>
+                        <td><code>clip_l</code></td>
+                        <td>The name the L text encoder located in the <code>models/clip</code> in your ComfyUI installation.</td>
+                    </tr>
+                    <tr>
+                        <td><code>save_images</code></td>
+                        <td>Whether to store all generated images in the ComfyUI output folder.</td>
+                    </tr>
+                    <tr>
+                        <td><code>placeholder_image_font_filepath</code></td>
+                        <td>Here you can customize the font if you want. For Windows is has to be changed to Windows path <code>C:/Windows/Fonts/arial.ttf</code></td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" class="bold">prompt_enhancement</td>
+                    </tr>
+                    <tr>
+                        <td><code>service</code></td>
+                        <td>Service used to generate the enhanced prompts. Currently only <code>"anthropic"</code> is supported.</td>
+                    </tr>
+                    <tr>
+                        <td><code>api_key</code></td>
+                        <td>API key for the prompt generation service. For <code>"anthropic"</code> its the API key you can find in your Anthropic Console.</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p>And thats it! Now we can start the bot!</p>
+            <div class="note">
+                <span>If you are interested in configuring the bot further visit the <a href="dev.html">Customization and Extensibility page</a>.</span>
+            </div>
+        </section>
+        <section id="run">
+            <h2>Running the Bot</h2>
+            <p>The Bot can be started by executing the <code>run.py</code> script.</p>
+            <pre>python3 run.py</pre>
+        </section>
+        <section>
+            <h2>Where to go next?</h2>
+            <div class="btn-cont">
+                <a href="usage.html" class="btn-link">Using the Bot</a>
+                <a href="dev.html" class="btn-link">Customizing and Extending the Bot</a>
+            </div>
+        </section>
+    </article>
+
+</body>
+</html>

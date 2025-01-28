@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ComfyUI Bot - Usage</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header class="container">
+        <nav class="navbar">
+            <a href="index.html" class="lead">ComfyUI Telegram Bot</a>
+            <a href="setup.html">Setup</a>
+            <a href="usage.html" class="active">Usage</a>
+            <a href="dev.html">Customization and Extensibility</a>
+        </nav> 
+    </header>
+    <article class="container">
+        <h1>Using the Bot</h1>
+        <div>
+            <div class="contents">
+                <span class="bold">Contents</span>
+                <ul>
+                    <li><a href="#commands">Bot Commands</a></li>
+                    <li><a href="#generation">Image Generation</a></li>
+                    <li><a href="#params">Generation Parameters</a></li>
+                    <li><a href="#modes">Available Modes</a></li>
+                    <li><a href="#prompt_enhancement">Prompt Enhancement</a></li>
+                    <li><a href="#examples">Usage Examples</a></li>
+                    <li><a href="#prompting">Prompting Guide</a></li>
+                </ul>
+            </div>
+        </div>
+        <section id="commands">
+            <h2>Bot Commands</h2>
+            <table class="basic-table bold-table">
+                <tbody>
+                    <tr>
+                        <td>/start</td>
+                        <td>Display the welcome message</td>
+                    </tr>
+                    <tr>
+                        <td>/help</td>
+                        <td>Show the help message</td>
+                    </tr>
+                    <tr>
+                        <td>/cancel</td>
+                        <td>Cancel the current image generation</td>
+                    </tr>
+                    <tr>
+                        <td>/cancelall</td>
+                        <td>Cancel all generations in queue</td>
+                    </tr>
+                    <tr>
+                        <td>/status</td>
+                        <td>Check your queue status</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+        <section id="generation">
+            <h2>Image Generation</h2>
+            <p>To generate an image, simply send a text message with your prompt. You can optionally include generation parameters at the end of your prompt.</p>
+        </section>
+        <section id="params">
+            <h2>Generation Parameters</h2>
+            <table class="basic-table bold-table">
+                <tbody>
+                    <tr>
+                        <td>Resolution</td>
+                        <td>Set specific dimensions, e.g. <code>1920x1080</code></td>
+                    </tr>
+                    <tr>
+                        <td>Aspect ratio</td>
+                        <td>Use predefined ratio, e.g. <code>16:9</code></td>
+                    </tr>
+                    <tr>
+                        <td>Megapixel size</td>
+                        <td>Set size in megapixels, e.g. <code>4MP</code> (overrides resolution)</td>
+                    </tr>
+                    <tr>
+                        <td>Batch size</td>
+                        <td>Number of images to generate, e.g. <code>3x</code></td>
+                    </tr>
+                    <tr>
+                        <td>Guidance (cfg)</td>
+                        <td>Controls style adherence: <code>cfg=3.5</code><br>
+                            1-2 for paintings<br>
+                            1.5-2.5 realistic<br>
+                            3.5 balanced (default)<br>
+                            4 flat colors/cartoon</td>
+                    </tr>
+                    <tr>
+                        <td>Steps</td>
+                        <td>Generation steps, e.g. <code>s=20</code></td>
+                    </tr>
+                    <tr>
+                        <td>Seed</td>
+                        <td>Set specific seed, e.g. <code>seed=123456789</code> (random by default)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+        <section id="modes">
+            <h2>Available Modes</h2>
+            <table class="basic-table bold-table">
+                <tbody>
+                    <tr>
+                        <td>Default (<code>m=default</code>)</td>
+                        <td>Basic mode with balanced settings<br>
+                            cfg=3.5, steps=20<br>
+                            sampler=euler, scheduler=simple</td>
+                    </tr>
+                    <tr>
+                        <td>Real (<code>m=real</code>)</td>
+                        <td>Photorealistic style<br>
+                            cfg=2, steps=25<br>
+                            Uses flux-realism-lora with strength=1<br>
+                            sampler=deis, scheduler=ddim_uniform</td>
+                    </tr>
+                    <tr>
+                        <td>Paint (<code>m=paint</code>)</td>
+                        <td>Artistic painting style<br>
+                            cfg=1.5, steps=20<br>
+                            sampler=euler, scheduler=simple</td>
+                    </tr>
+                    <tr>
+                        <td>Amateur (<code>m=amateur</code>)</td>
+                        <td>Nostalgic 2000s blog aesthetic<br>
+                            cfg=2.5, steps=20<br>
+                            Uses amateurphoto-v3.5 lora with strength=0.8<br>
+                            sampler=deis, scheduler=ddim_uniform</td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">You can add more modes or edit the default ones. More information <a href="dev.html#modes">here</a>.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+        <section id="prompt_enhancement">
+            <h2>Prompt Enhancement</h2>
+            <table class="basic-table bold-table">
+                <tbody>
+                    <tr>
+                        <td>Default (<code>pe=default</code>)</td>
+                        <td>Follows Flux prompting guide to create detailed and coherent prompts</td>
+                    </tr>
+                    <tr>
+                        <td>Sharp Background (<code>pe=sharp_bg</code>)</td>
+                        <td>Separates scene elements with First, Second, Third, etc. for sharper and more distinct elements</td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">Prompt Enhancement is fully customizeable. More information <a href="dev.html#prompt_enhancement">here</a>.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+        <section>
+            <h2 id="examples">Usage Examples</h2>
+            <table>
+                <tbody>
+                    <tr>
+                        <td class="padding-sm" rowspan="2">Example prompts:</td>
+                        <td class="padding-sm"><code>A landscape with mountains 1920x1080 2x</code></td>
+                    </tr>
+                    <tr>
+                        <td class="padding-sm"><code>A man in a red t-shirt 2MP pe=default m=real</code></td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+        <section>
+            <h2 id="prompting">Prompting Guide</h2>
+            <ol>
+                <li>Write a description of what you want in the image. Don't write instructions!
+                    <ul>
+                        <li>DO: "A winter landscape"</li>
+                        <li>DON'T: "Create an image of..."</li>
+                    </ul>
+                </li>
+                <li>Write full sentences. Don't write words separated by commas.
+                    <ul>
+                        <li>DO: "A man sitting on a bench wearing a red t-shirt."</li>
+                        <li>DON'T: "man, sitting on bench, red t-shirt"</li>
+                    </ul>
+                </li>
+            </ol>
+            <div class="note">
+                <span>If you use Prompt enhancement, you can input basically anything and your prompt will be rewritten in the correct style.</span>
+            </div>
+        </section>
+        <section>
+            <h2 id="run">Where to go next?</h2>
+            <div class="btn-cont">
+                <a href="dev.html" class="btn-link">Customizing and Extending the Bot</a>
+            </div>
+        </section>
+
+    </article>
+</body>
+</html>

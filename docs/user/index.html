@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ComfyUI Bot - Introduction</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header class="container">
+        <nav class="navbar">
+            <a href="index.html" class="lead active">ComfyUI Telegram Bot</a>
+            <a href="setup.html">Setup</a>
+            <a href="usage.html">Usage</a>
+            <a href="dev.html">Customization and Extensibility</a>
+        </nav> 
+    </header>
+    <article class="container">
+        <div>
+            <img src="tel_bot.jpg" class="centered-img" id="title_img" alt="Title image">
+        </div>
+        <h1 class="text-center">ComfyUI Telegram Bot</h1>
+        <p class="text-center">This project aims to create a user friendly way to generate images (through ComfyUI) over Telegram.</p>
+        <section>
+            <h2>Quick Start</h2>
+            <div class="btn-cont">
+                <a href="setup.html" class="btn-link">Setting it all up</a>
+                <a href="usage.html" class="btn-link">Using the Bot</a>
+                <a href="dev.html" class="btn-link">Customizing and Extending the Bot</a>
+            </div>
+        </section>
+        <section>
+            <h2>Showcase</h2>
+            <div class="showcase-cont">
+                <div>
+                    <img src="gen_fin.png" class="centered-img showcase-img" alt="Final generated image with prompt enhancement">
+                    <p class="text-center">Final generated image with prompt enhancement</p>
+                </div>
+                <div>
+                    <img src="gen_progress.png" class="centered-img showcase-img" alt="Generation progress and preview">
+                    <p class="text-center">Generation progress and preview</p>
+                </div>
+                <div>
+                    <img src="command_cancel.png" class="centered-img showcase-img" alt="Cancelling generations">
+                    <p class="text-center">Cancelling generations</p>
+                </div>
+                <div>
+                    <img src="command_status.png" class="centered-img showcase-img" alt="Generation queue status">
+                    <p class="text-center">Generation queue status</p>
+                </div>
+            </div>
+        </section>
+        <section>
+            <h2>How does it all work?</h2>
+            <p>This projects acts as a Telegram bot that communicates with your ComfyUI server.</p>
+            <p>You as the user can send prompts with generation parameters as Telegram messages to the bot.</p>
+            <p>The bot sends you a message acknowledging your request and adds it to the queue.</p>
+            <p>You will receive messages as soon as the generation starts. The message will be updated with generation previews and then the final image.</p>
+        </section>
+        <section>
+            <h2>Features</h2>
+            <table class="basic-table bold-table">
+                <tbody>
+                    <tr>
+                        <td>TXT2IMG generation</td>
+                        <td>Generate images using Flux.1 Dev from text.</td>
+                    </tr>
+                    <tr>
+                        <td>Generation parameters</td>
+                        <td>Change the parameters like steps and guidance (cfg). List of all parameters <a href="usage.html#params">here</a>.</td>
+                    </tr>
+                    <tr>
+                        <td>Queueing</td>
+                        <td>Queue you generations and let them execute sequentialy.</td>
+                    </tr>
+                    <tr>
+                        <td>Prompt enhancement</td>
+                        <td>Enhance your prompts using Claude 3.5 Sonnet. To change the text enhancement system prompts or add new ones look here <a href="dev.html#prompt_enhancement_system_prompts"></a></td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">And much more...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+        <section>
+            <h2>Limitations</h2>
+            <table class="basic-table bold-table">
+                <tbody>
+                    <tr>
+                        <td>No IMG2IMG generation</td>
+                        <td>If you are interested in adding this, you can contribute <a href="dev.html#contributing">here</a>.</td>
+                    </tr>
+                    <tr>
+                        <td>No model switching</td>
+                        <td>The model is configured during the setup of the bot.</td>
+                    </tr>
+                    <tr>
+                        <td>No LORA stacking</td>
+                        <td>The bot works with modes which are configurable sets of parameters and can only include a single LORA.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+    </article>
+</body>
+</html>

@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ComfyUI Bot - Customization and Extensibility</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header class="container">
+        <nav class="navbar">
+            <a href="index.html" class="lead">ComfyUI Telegram Bot</a>
+            <a href="setup.html">Setup</a>
+            <a href="usage.html">Usage</a>
+            <a href="dev.html" class="active">Customization and Extensibility</a>
+        </nav> 
+    </header>
+    <article class="container">
+        <h1>Customization and Extensibility</h1>
+        <div>
+            <div class="contents">
+                <span><b>Contents</b></span>
+                <ul>
+                    <li><a href="#modes">Editing and Adding Modes</a></li>
+                    <li><a href="#model_and_workflow">Changing the Model and editing the Workflow</a></li>
+                    <li>
+                        <a href="#prompt_enhancement">Prompt Enhancement</a>
+                        <ul>
+                            <li><a href="#prompt_enhancement_system_prompts">System Prompts</a></li>
+                            <li><a href="#prompt_enhancement_services">Services</a></li>        
+                        </ul>
+                    </li>
+                    <li><a href="#contributing">Contributing</a></li>
+                </ul>
+            </div>
+        </div>
+        <section id="modes">
+            <h2>Editing and Adding Modes</h2>
+            <p>All of the modes can be edited in the <code>config.yaml</code> file.</p>
+            <p>Adding a new mode is as simple as adding it in the config. To use it when generating add <code>m=&lt;name of your mode&gt;</code> to the end of your prompt. To change the defaults create a <code>default</code> mode.</p>
+            <table class="basic-table bold-table">
+                <thead>
+                    <tr>
+                        <th colspan="2" class="bold">Mode configuration options</th>
+                        <th>Default</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>cfg</code></td>
+                        <td>Guidance scale</td>
+                        <td>3.5</td>
+                    </tr>
+                    <tr>
+                        <td><code>steps</code></td>
+                        <td>Number of sampling steps</td>
+                        <td>20</td>
+                    </tr>
+                    <tr>
+                        <td><code>lora</code></td>
+                        <td>Name of LORA to use in your ComfyUI <code>models/loras</code> folder.</td>
+                        <td>No LORA</td>
+                    </tr>
+                    <tr>
+                        <td><code>lora_strength</code></td>
+                        <td>Strength of LORA effect</td>
+                        <td>1.0</td>
+                    </tr>
+                    <tr>
+                        <td><code>sampler</code></td>
+                        <td>Sampling method to use</td>
+                        <td>"euler"</td>
+                    </tr>
+                    <tr>
+                        <td><code>scheduler</code></td>
+                        <td>Scheduler to use</td>
+                        <td>"simple"</td>
+                    </tr>
+                    <tr>
+                        <td><code>prompt_template_pre_pe</code></td>
+                        <td>Template for prompt before enhancement. <code>{}</code> is replaced with the prompt before prompt enhancement.</td>
+                        <td>"{}"</td>
+                    </tr>
+                    <tr>
+                        <td><code>prompt_template_post_pe</code></td>
+                        <td>Template for prompt after enhancement. <code>{}</code> is replaced with the prompt after prompt enhancement.</td>
+                        <td>"{}"</td>
+                    </tr>
+                    <tr>
+                        <td><code>description</code></td>
+                        <td>Description of the mode</td>
+                        <td>No description</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+        <section id="model_and_workflow">
+            <h2>Changing the Model and editing the Workflow</h2>
+            <p>This project works with only one workflow. This limits it to UNET models.</p>
+            <p>If you want to use a different workflow or model you will have to change some code.</p>
+            <p>
+                To make the project work with a custom workflow edit the <code>_prepare_workflow</code> method in 
+                the <code>comfyui_telegram_bot/image_gen.py</code> file.
+                Edit the method to match the node IDs and node attributes in your workflow file.
+            </p>
+            <div>
+                <div class="note">
+                    <p>To export a workflow from ComfyUI in the correct format:</p>
+                    <ol>
+                        <li>Open your workflow in the ComfyUI web interface.</li>
+                        <li>Go to Settings (gear icon in the right vertical menu) -> Dev Mode -> Enable dev mode options -> ON</li>
+                        <li>Close settings</li>
+                        <li>Click the <code>Save (API Format)</code> button in the right vertical menu.</li>
+                    </ol>    
+                </div>
+            </div>
+        </section>
+        <section id="prompt_enhancement">
+            <h2>Prompt Enhancement</h2>
+            <p>Prompt Enhancement is fully customizeable. This means that you can change the system prompts for the LLMs and you can also change what LLM you want to use.</p> 
+            <section id="prompt_enhancement_system_prompts">
+                <h3>System Prompts</h3>
+                <p>All of the system prompts can be edited in the <code>config.yaml</code> file.</p>
+                <p>Adding a new prompt enhancement 'types' is as simple as adding it in the config. To use it when generating add <code>pe=&lt;name of your prompt enhancement type&gt;</code> to the end of your prompt.</p>
+                <table class="basic-table bold-table">
+                    <thead>
+                        <tr>
+                            <th colspan="2" class="bold">Prompt enhancement type configuration options</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>description</code></td>
+                            <td>Description of the prompt enhancement type</td>
+                        </tr>
+                        <tr>
+                            <td><code>system_prompt</code></td>
+                            <td>
+                                System Prompt of the LLM. 
+                                <span class="bold">Important: The LLM has to be instructed to return the enhanced prompt in &lt;prompt&gt;&lt;/prompt&gt; tags!</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>    
+            </section>
+            <section id="prompt_enhancement_services">
+                <h3>Services</h3>
+                <p>There is currently only one prompt enhancement service implemented and that is for the Anthropic API.</p> 
+                <p>
+                    Adding more is as simple as creating a new Python script in the <code>comfyui_telegram_bot/services</code> folder 
+                    with the name of your service. Then you write a class extending the <code>PromptEnhanceService</code> class 
+                    and implementing the <code>enhance_prompt</code> method.
+                </p> 
+                <p>For reference on how this can be done, you can read the <code>comfyui_telegram_bot/services/anthropic.py</code> file.</p>
+            </section>
+        </section>
+        <section id="contributing">
+            <h2>Contributing</h2>
+            <p>I welcome all contributions. Simply create a pull request on the GitHub repository and I will review it.</p>
+            <p class="bold">Ideas for Improvements:</p>
+            <ul>
+                <li>Model switching</li>
+                <li>Configuration options to work with any Workflow file</li>
+                <li>IMG2IMG</li>
+                <li>OpenAI prompt enhancement service</li>
+            </ul>
+        </section>
+    </article>
+</body>
+</html>
