@@ -1,5 +1,5 @@
 # User Documentation
-The user documentation is in the `/docs/user/` folder as an HTML website. 
+The user documentation is in the `/docs/user/` folder as an HTML website. It is also hosted [here](https://lovec741.github.io/comfyui_telegram_bot/user/index.html) on GitHub. 
 
 # Developer Documentation
 ## Overview
